@@ -2,7 +2,10 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.Timers;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using CClient;
 
 namespace GameClient
 {
@@ -19,6 +22,8 @@ namespace GameClient
 
 
         object lockobj = new object();
+        SocketAsyncEventArgs m_sendArgs;
+        SocketAsyncEventArgs m_recvArgs;
         /// </summary>
         /// 
 
@@ -31,14 +36,54 @@ namespace GameClient
         public  GameClient()
         {
             m_connEventArg = new SocketAsyncEventArgs();
+            m_sendArgs = new SocketAsyncEventArgs();
+            m_recvArgs = new SocketAsyncEventArgs();
+
+            m_sendArgs.Completed -= new EventHandler<SocketAsyncEventArgs>(this.SendCallBack);
+            m_sendArgs.Completed += new EventHandler<SocketAsyncEventArgs>(this.SendCallBack);
+
+
             
+
+            m_recvArgs.Completed -= new EventHandler<SocketAsyncEventArgs>(this.RecvCallBack);
+            m_recvArgs.Completed += new EventHandler<SocketAsyncEventArgs>(this.RecvCallBack);
         }
 
+        
+        public void SendCallBack(object target, SocketAsyncEventArgs e)
+        {
+
+        }
+
+        public void RecvCallBack(object target, SocketAsyncEventArgs e)
+        {
+            var str = Encoding.Default.GetString(e.Buffer);
+            Console.WriteLine(str);
+        }
+
+        public void OnTimer(object o)
+        {
+            m_sendArgs.BufferList = NetUtil.CreateBuffList<byte>(Encoding.Default.GetBytes("yangjienihaozaoshang"),
+                4);
+
+            m_socket.SendAsync(m_sendArgs);
+        }
         public void OnSucessLogin()
         {
-            string str = "nihao";
-            var bytes = System.Text.Encoding.Default.GetBytes(str);
-            m_socket.Send(bytes);
+            //string str = "nihao";
+            //var bytes = System.Text.Encoding.Default.GetBytes(str);
+            //m_socket.Send(bytes);
+
+
+            Timer ts = new Timer(this.OnTimer, null, 100, 1000);
+           
+
+
+            //接受消息 
+            byte[] buffer = new byte[1000];
+            m_recvArgs.SetBuffer(buffer,0,1000);
+            m_socket.ReceiveAsync(m_recvArgs);
+            
             //m_socket
         }
        
