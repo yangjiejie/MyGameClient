@@ -43,7 +43,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client.cs" />
+    <Compile Include="IOSocket.cs" />
     <Compile Include="main.cs" />
+    <Compile Include="NetMsgDefine.cs" />
     <Compile Include="NetUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
